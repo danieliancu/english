@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import './index.css';
 
 // Ensure you have this line to access the API key securely
-const secretCode = process.env.REACT_APP_SECRET_CODE;
+const secretCode = process.env.REACT_APP_CODE;
 
 const openai = new OpenAI({
   apiKey: secretCode, dangerouslyAllowBrowser: true
