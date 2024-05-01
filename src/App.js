@@ -5,7 +5,7 @@ import './index.css';
 
 
 const openai = new OpenAI({
-  apiKey: process.env.REACT_APP_CODE, dangerouslyAllowBrowser: true // Access the API key securely from the environment variables
+  apiKey: process.env.REACT_APP_CODE
 });
 
 function ChatAssistant() {
