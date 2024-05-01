@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import OpenAI from 'openai';
 import './index.css';
 
+// Ensure you have this line to access the API key securely
+const secretCode = process.env.REACT_APP_SECRET_CODE;
+
 const openai = new OpenAI({
-  apiKey: 'sk-proj-j7sx2vBjZzAoa0qADINKT3BlbkFJzVIdexQ0jr3T0smjB3HO', // Environment variable for API key
-  dangerouslyAllowBrowser: true
+  apiKey: secretCode, dangerouslyAllowBrowser: true
 });
 
 function ChatAssistant() {
@@ -16,44 +18,42 @@ function ChatAssistant() {
   async function generateText() {
     setIsLoading(true);
     try {
-        const completion = await openai.chat.completions.create({
-            messages: [{ role: "system", content: "genereaza un text scurt in românește, cheltuie maximum 100 de tokens. Genereaza doar textul, fara alta introducere. Nu lăsa fraza nefinalizată!" }],
-            model: "gpt-3.5-turbo",
-            max_tokens: 100 // Adjust this value as needed
-        });
-        setOriginalText(completion.choices[0].message.content);
-        setTranslatedText(''); // Reset the translation textarea
+      const completion = await openai.chat.completions.create({
+        messages: [{ role: "system", content: "genereaza un text scurt in românește, cheltuie maximum 100 de tokens. Genereaza doar textul, fara alta introducere. Nu lăsa fraza nefinalizată!" }],
+        model: "gpt-3.5-turbo",
+        max_tokens: 100 // Adjust this value as needed
+      });
+      setOriginalText(completion.choices[0].message.content);
+      setTranslatedText(''); // Reset the translation textarea
     } catch (error) {
-        console.error('Error generating text:', error);
-        setOriginalText('Failed to generate text, check the console for more information.');
+      console.error('Error generating text:', error);
+      setOriginalText('Failed to generate text, check the console for more information.');
     }
     setIsLoading(false);
-}
+  }
 
-
-async function fetchResponse() {
-  if (!translatedText) return; // Ensure there's translated text to check
-  setIsLoading(true);
-  try {
+  async function fetchResponse() {
+    if (!translatedText) return; // Ensure there's translated text to check
+    setIsLoading(true);
+    try {
       const completion = await openai.chat.completions.create({
-          messages: [
-            {
-              "role": "system",
-              "content": "Act as an ultra-exacting English teacher focused on British English. Review any text with utmost care, concentrating on tenses, British expressions, grammar, and sentence structure to align strictly with British norms, ignoring the original Romanian structure. After identifying errors, generate an HTML table with each row styled with a border of 1px solid black and 10px padding. The header should have a black background with white text. The table should not include any introductory text and must list the type of error (vocabulary, grammar, expression, sentence structure) in the left column wrapped in <strong> tags, with a detailed correction and explanation on the right. Conclude with the rewritten text, followed by an HTML <hr /> and a <strong>Grade:</strong> on a scale from 1 to 10, based on the accuracy of the original translation. Clearly identify each incorrect word or expression in the table and provide explanations. Delete ```html and ``` signs"
-            },
-            { role: "user", content: translatedText }
-          ],
-          model: "gpt-4-1106-preview",
-          max_tokens: 1000 // Adjust this value based on your needs for feedback length
+        messages: [
+          {
+            "role": "system",
+            "content": "Act as an ultra-exacting English teacher focused on British English. Review any text with utmost care, concentrating on tenses, British expressions, grammar, and sentence structure to align strictly with British norms, ignoring the original Romanian structure. After identifying errors, generate an HTML table with each row styled with a border of 1px solid black and 10px padding. The header should have a black background with white text. The table should not include any introductory text and must list the type of error (vocabulary, grammar, expression, sentence structure) in the left column wrapped in <strong> tags, with a detailed correction and explanation on the right. Conclude with the rewritten text, followed by an HTML <hr /> and a <strong>Grade:</strong> on a scale from 1 to 10, based on the accuracy of the original translation. Clearly identify each incorrect word or expression in the table and provide explanations."
+          },
+          { role: "user", content: translatedText }
+        ],
+        model: "gpt-4-1106-preview",
+        max_tokens: 1000 // Adjust this value based on your needs for feedback length
       });
       setResponse(completion.choices[0].message.content);
-  } catch (error) {
+    } catch (error) {
       console.error('Failed to fetch data:', error);
       setResponse('Failed to load response, check the console for more information.');
+    }
+    setIsLoading(false);
   }
-  setIsLoading(false);
-}
-
 
   return (
     <div className="p-5">
